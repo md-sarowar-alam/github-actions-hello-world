@@ -1,10 +1,10 @@
 # GitHub Actions - EC2 Management Workflows
 
-This repository demonstrates how to use GitHub Actions to manage and monitor AWS EC2 instances with two automated workflows.
+This repository demonstrates how to use GitHub Actions to manage and monitor AWS EC2 instances with three automated workflows.
 
 ## 🎯 What This Does
 
-This project includes two workflows:
+This project includes three workflows:
 
 ### Workflow 1: EC2 Connectivity Check (Automatic)
 Runs automatically on every push to main branch:
@@ -26,6 +26,13 @@ Manual execution to manage EC2 hostname:
 - Updates configuration for persistence across reboots
 - Verifies the hostname change was successful
 - Skips if hostname is already correct
+
+### Workflow 3: Execute Metadata Script (Manual)
+Manual execution to run custom script on EC2:
+- Connects to EC2 instance via SSH
+- Checks if `/home/ubuntu/metadata.sh` exists
+- Executes the script and displays output
+- Shows results directly in GitHub Actions console
 
 ## 🚀 Quick Start Guide
 
@@ -164,6 +171,25 @@ on:
 5. **Verify Hostname Change**: Confirms the change was successful
 6. **Cleanup SSH Key**: Removes SSH key for security
 
+### Workflow 3: Execute Metadata Script
+
+**Trigger:** Manual execution only via GitHub UI
+```yaml
+on:
+  workflow_dispatch:
+```
+
+**Workflow Steps:**
+1. **Checkout Repository**: Gets the latest code
+2. **Setup SSH Key**: Configures secure SSH connection
+3. **Check if metadata.sh exists**: Verifies the script file is present
+4. **Execute metadata.sh script** (conditional):
+   - Makes script executable
+   - Runs the script on EC2 instance
+   - Displays all output in GitHub Actions console
+5. **File Not Found** (conditional): Shows helpful error if script doesn't exist
+6. **Cleanup SSH Key**: Removes SSH key for security
+
 ## 📋 Viewing Workflow Results
 
 ### EC2 Connectivity Check Workflow
@@ -186,6 +212,20 @@ To run manually:
 6. Click the green **"Run workflow"** button
 7. Wait a few seconds and refresh to see the run appear
 8. Click on the run to view execution details
+
+### Execute Metadata Script Workflow
+
+To run manually:
+1. Go to your repository on GitHub
+2. Click the **Actions** tab (top navigation)
+3. Click **"Execute Metadata Script"** workflow in the left sidebar
+4. Click **"Run workflow"** button (top right)
+5. Select branch (usually `main`)
+6. Click the green **"Run workflow"** button
+7. Wait a few seconds and refresh to see the run appear
+8. Click on the run to view script output
+
+**Note:** Make sure `/home/ubuntu/metadata.sh` exists on your EC2 instance before running this workflow.
 
 ## 🔒 Security Best Practices
 
@@ -261,7 +301,8 @@ Then use `${{ inputs.hostname }}` in the workflow steps.
 ├── .github/
 │   └── workflows/
 │       ├── ec2-connectivity-check.yml    # Automatic EC2 monitoring workflow
-│       └── fix-hostname.yml              # Manual hostname management workflow
+│       ├── fix-hostname.yml              # Manual hostname management workflow
+│       └── execute-metadata-script.yml   # Manual script execution workflow
 ├── .gitignore                            # Files to ignore in git
 └── README.md                             # This file
 ```
@@ -314,8 +355,7 @@ Then use `${{ inputs.hostname }}` in the workflow steps.
 | Workflow | Trigger | Purpose | File |
 |----------|---------|---------|------|
 | EC2 Connectivity Check | Automatic (Push to main) | Monitor EC2 and extract metadata | [ec2-connectivity-check.yml](.github/workflows/ec2-connectivity-check.yml) |
-| Fix The Hostname | Manual (workflow_dispatch) | Set EC2 hostname to HelloWorld | [fix-hostname.yml](.github/workflows/fix-hostname.yml) |
-
+| Fix The Hostname | Manual (workflow_dispatch) | Set EC2 hostname to HelloWorld | [fix-hostname.yml](.github/workflows/fix-hostname.yml) || Execute Metadata Script | Manual (workflow_dispatch) | Run custom script on EC2 | [execute-metadata-script.yml](.github/workflows/execute-metadata-script.yml) |
 ---
 
 ## 🧑‍💻 Author
